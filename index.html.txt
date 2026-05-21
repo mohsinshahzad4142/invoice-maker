@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Maker — Ahmed Digital Studio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f5f5f0;min-height:100vh;padding:20px}
+h1{font-size:20px;font-weight:500;color:#185FA5;margin-bottom:20px}
+.wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1100px;margin:auto}
+.panel{background:white;border:1px solid #e0e0d8;border-radius:12px;padding:1.25rem}
+.sec-title{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.field-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.field-row label{font-size:12px;color:#666}
+.field-row input,.field-row textarea,.field-row select{font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid #ddd;background:#fafafa;color:#222;font-family:inherit;width:100%}
+.field-row textarea{resize:none;height:56px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.item-row{display:grid;grid-template-columns:1fr 55px 70px 28px;gap:6px;align-items:center;margin-bottom:6px}
+.item-row input{font-size:12px;padding:6px 8px}
+.del-btn{background:none;border:none;cursor:pointer;color:#aaa;font-size:18px;padding:2px 6px;border-radius:4px}
+.del-btn:hover{color:#c0392b;background:#fdf0ed}
+.add-btn{font-size:12px;color:#185FA5;background:none;border:1px solid #b5d4f4;border-radius:8px;padding:6px 12px;cursor:pointer;width:100%;margin-top:4px}
+.add-btn:hover{background:#e6f1fb}
+.totals{margin-top:12px;border-top:1px solid #eee;padding-top:12px}
+.total-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:#666}
+.total-grand{display:flex;justify-content:space-between;font-size:15px;font-weight:600;padding:8px 0 0;color:#185FA5;border-top:1px solid #ddd;margin-top:6px}
+.preview{background:white;border:1px solid #ddd;border-radius:12px;padding:1.5rem}
+.inv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #185FA5}
+.inv-title{font-size:24px;font-weight:700;color:#185FA5;letter-spacing:.08em}
+.inv-num{font-size:12px;color:#888;margin-top:4px}
+.biz-name{font-size:15px;font-weight:600;color:#222}
+.biz-detail{font-size:12px;color:#666;line-height:1.6;margin-top:2px}
+.inv-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.meta-box{background:#f5f5f0;border-radius:8px;padding:10px 12px}
+.meta-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.06em}
+.meta-val{font-size:13px;font-weight:600;color:#222;margin-top:2px}
+.inv-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+.inv-table th{text-align:left;padding:7px 8px;background:#e6f1fb;color:#0c447c;font-weight:600;font-size:11px}
+.inv-table td{padding:7px 8px;border-bottom:1px solid #eee;color:#444}
+.inv-totals{margin-left:auto;width:200px}
+.inv-total-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:#888}
+.inv-grand{display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:8px 0 0;color:#185FA5;border-top:2px solid #185FA5;margin-top:6px}
+.inv-footer{margin-top:16px;padding-top:12px;border-top:1px solid #eee;font-size:11px;color:#aaa}
+.action-row{display:flex;gap:8px;margin-top:12px}
+.btn-primary{flex:1;padding:10px;font-size:13px;border-radius:8px;background:#185FA5;color:white;border:none;cursor:pointer;font-family:inherit;font-weight:500}
+.btn-primary:hover{background:#0c447c}
+.btn-sec{flex:1;padding:10px;font-size:13px;border-radius:8px;background:none;color:#333;border:1px solid #ddd;cursor:pointer;font-family:inherit}
+.btn-sec:hover{background:#f5f5f0}
+@media(max-width:768px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>Invoice Maker</h1>
+<div class="wrap">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="panel">
+      <div class="sec-title">Aapki Business Info</div>
+      <div class="field-row"><label>Business / Aapka Naam</label><input id="bizName" value="Ahmed Digital Studio" oninput="update()"></div>
+      <div class="two-col">
+        <div class="field-row"><label>Email</label><input id="bizEmail" value="ahmed@studio.pk" oninput="update()"></div>
+        <div class="field-row"><label>Phone</label><input id="bizPhone" value="+92 300 1234567" oninput="update()"></div>
+      </div>
+      <div class="field-row"><label>Address</label><textarea id="bizAddr" oninput="update()">Karachi, Pakistan</textarea></div>
+    </div>
+    <div class="panel">
+      <div class="sec-title">Client Info</div>
+      <div class="field-row"><label>Client ka Naam</label><input id="clientName" value="XYZ Company" oninput="update()"></div>
+      <div class="field-row"><label>Client Email</label><input id="clientEmail" value="client@xyz.com" oninput="update()"></div>
+      <div class="two-col">
+        <div class="field-row"><label>Invoice #</label><input id="invNum" value="INV-001" oninput="update()"></div>
+        <div class="field-row"><label>Due Date</label><input id="dueDate" type="date" oninput="update()"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="sec-title">Services / Items</div>
+      <div style="display:grid;grid-template-columns:1fr 55px 70px 28px;gap:6px;margin-bottom:4px">
+        <span style="font-size:11px;color:#aaa">Description</span>
+        <span style="font-size:11px;color:#aaa">Qty</span>
+        <span style="font-size:11px;color:#aaa">Rate ($)</span>
+        <span></span>
+      </div>
+      <div id="itemsContainer"></div>
+      <button class="add-btn" onclick="addItem()">+ Item Add Karo</button>
+      <div class="totals">
+        <div class="two-col" style="margin-bottom:10px">
+          <div class="field-row"><label>Tax %</label><input id="taxRate" type="number" value="0" min="0" max="100" oninput="update()"></div>
+          <div class="field-row"><label>Discount %</label><input id="discRate" type="number" value="0" min="0" max="100" oninput="update()"></div>
+        </div>
+        <div class="total-row"><span>Subtotal</span><span id="subtotalDisp">$0.00</span></div>
+        <div class="total-row"><span>Tax</span><span id="taxDisp">$0.00</span></div>
+        <div class="total-row"><span>Discount</span><span id="discDisp">-$0.00</span></div>
+        <div class="total-grand"><span>Total</span><span id="grandDisp">$0.00</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="sec-title">Notes / Payment Terms</div>
+      <div class="field-row"><textarea id="notes" oninput="update()" style="height:64px">Payment within 7 days. Thank you for your business!</textarea></div>
+    </div>
+    <div class="action-row">
+      <button class="btn-primary" onclick="printInv()">⬇ Download PDF</button>
+      <button class="btn-sec" onclick="clearAll()">Reset</button>
+    </div>
+  </div>
+  <div>
+    <div style="font-size:11px;color:#aaa;margin-bottom:8px">Live Preview (auto-update)</div>
+    <div class="preview" id="preview">
+      <div class="inv-header">
+        <div><div class="inv-title">INVOICE</div><div class="inv-num" id="p-invnum">INV-001</div></div>
+        <div style="text-align:right">
+          <div class="biz-name" id="p-bizname">Ahmed Digital Studio</div>
+          <div class="biz-detail" id="p-bizdetail">ahmed@studio.pk<br>+92 300 1234567<br>Karachi, Pakistan</div>
+        </div>
+      </div>
+      <div class="inv-meta">
+        <div class="meta-box"><div class="meta-label">Billed To</div><div class="meta-val" id="p-client">XYZ Company</div><div style="font-size:11px;color:#888;margin-top:2px" id="p-clientemail">client@xyz.com</div></div>
+        <div class="meta-box"><div class="meta-label">Due Date</div><div class="meta-val" id="p-due">—</div><div style="font-size:11px;color:#27a06a;margin-top:2px;font-weight:600">Payment Pending</div></div>
+      </div>
+      <table class="inv-table">
+        <thead><tr><th>Description</th><th>Qty</th><th>Rate</th><th style="text-align:right">Amount</th></tr></thead>
+        <tbody id="p-items"></tbody>
+      </table>
+      <div class="inv-totals">
+        <div class="inv-total-row"><span>Subtotal</span><span id="p-sub">$0.00</span></div>
+        <div class="inv-total-row"><span>Tax</span><span id="p-tax">$0.00</span></div>
+        <div class="inv-total-row"><span>Discount</span><span id="p-disc">-$0.00</span></div>
+        <div class="inv-grand"><span>Total Due</span><span id="p-grand">$0.00</span></div>
+      </div>
+      <div class="inv-footer" id="p-notes">Payment within 7 days. Thank you for your business!</div>
+    </div>
+  </div>
+</div>
+<script>
+let items=[{desc:'Website Design',qty:1,rate:300},{desc:'Logo Design',qty:1,rate:150}];
+function addItem(){items.push({desc:'',qty:1,rate:0});renderItems();update()}
+function removeItem(i){items.splice(i,1);renderItems();update()}
+function renderItems(){
+  const c=document.getElementById('itemsContainer');
+  c.innerHTML=items.map((it,i)=>`<div class="item-row">
+    <input value="${it.desc}" oninput="items[${i}].desc=this.value;update()" placeholder="Service...">
+    <input type="number" value="${it.qty}" min="1" oninput="items[${i}].qty=+this.value;update()">
+    <input type="number" value="${it.rate}" min="0" oninput="items[${i}].rate=+this.value;update()">
+    <button class="del-btn" onclick="removeItem(${i})">×</button>
+  </div>`).join('');
+}
+function fmt(n){return'$'+n.toFixed(2)}
+function update(){
+  const sub=items.reduce((s,it)=>s+(it.qty*it.rate),0);
+  const tax=sub*(+(document.getElementById('taxRate').value||0)/100);
+  const disc=sub*(+(document.getElementById('discRate').value||0)/100);
+  const grand=sub+tax-disc;
+  document.getElementById('subtotalDisp').textContent=fmt(sub);
+  document.getElementById('taxDisp').textContent=fmt(tax);
+  document.getElementById('discDisp').textContent='-'+fmt(disc);
+  document.getElementById('grandDisp').textContent=fmt(grand);
+  document.getElementById('p-invnum').textContent=document.getElementById('invNum').value||'INV-001';
+  document.getElementById('p-bizname').textContent=document.getElementById('bizName').value;
+  document.getElementById('p-bizdetail').innerHTML=document.getElementById('bizEmail').value+'<br>'+document.getElementById('bizPhone').value+'<br>'+document.getElementById('bizAddr').value.replace(/\n/g,'<br>');
+  document.getElementById('p-client').textContent=document.getElementById('clientName').value;
+  document.getElementById('p-clientemail').textContent=document.getElementById('clientEmail').value;
+  const dd=document.getElementById('dueDate').value;
+  document.getElementById('p-due').textContent=dd?new Date(dd).toLocaleDateString('en-PK',{day:'numeric',month:'short',year:'numeric'}):'—';
+  document.getElementById('p-notes').textContent=document.getElementById('notes').value;
+  document.getElementById('p-items').innerHTML=items.map(it=>`<tr><td>${it.desc||'—'}</td><td>${it.qty}</td><td>${fmt(it.rate)}</td><td style="text-align:right">${fmt(it.qty*it.rate)}</td></tr>`).join('');
+  document.getElementById('p-sub').textContent=fmt(sub);
+  document.getElementById('p-tax').textContent=fmt(tax);
+  document.getElementById('p-disc').textContent='-'+fmt(disc);
+  document.getElementById('p-grand').textContent=fmt(grand);
+}
+function clearAll(){document.querySelectorAll('input,textarea').forEach(el=>{if(el.type!=='number')el.value='';else el.value='0'});items=[{desc:'',qty:1,rate:0}];renderItems();update()}
+function printInv(){
+  const prev=document.getElementById('preview').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write('<html><head><title>Invoice</title><style>body{font-family:sans-serif;padding:40px;max-width:700px;margin:auto}.inv-header{display:flex;justify-content:space-between;padding-bottom:16px;border-bottom:2px solid #185FA5;margin-bottom:20px}.inv-title{font-size:24px;font-weight:700;color:#185FA5}.inv-num,.biz-detail{font-size:12px;color:#888}.biz-name{font-size:15px;font-weight:600}.inv-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}.meta-box{background:#f5f5f0;border-radius:8px;padding:10px 12px}.meta-label{font-size:10px;color:#888;text-transform:uppercase}.meta-val{font-size:13px;font-weight:600}.inv-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}.inv-table th{background:#e6f1fb;color:#0c447c;padding:7px 8px;text-align:left}.inv-table td{padding:7px 8px;border-bottom:1px solid #eee}.inv-totals{margin-left:auto;width:200px}.inv-total-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:#888}.inv-grand{display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:8px 0 0;color:#185FA5;border-top:2px solid #185FA5;margin-top:6px}.inv-footer{margin-top:16px;padding-top:12px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body>'+prev+'</body></html>');
+  w.document.close();w.print();
+}
+renderItems();update();
+document.getElementById('dueDate').valueAsDate=new Date(Date.now()+7*864e5);
+update();
+</script>
+</body>
+</html>
